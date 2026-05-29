@@ -11,7 +11,7 @@
     <header class="header">
         <div class="header-inner">
             <div class="header-left">
-                @if($logo)<img src="{{$logo}}" alt="" class="header-logo">@endif
+                @if($logo)<img src="{{$logo}}" alt="">@endif
                 <h1 class="header-title">{{$title}}</h1>
             </div>
             <nav class="header-nav">
@@ -28,17 +28,19 @@
                 <h2>我的虚拟机</h2>
             </div>
             <div id="vmCards" class="vm-grid">
-                <div class="loading">加载中...</div>
+                <div class="loading">加载中</div>
             </div>
         </div>
 
-        <!-- VM Detail (hidden by default) -->
+        <!-- VM Detail -->
         <div id="vmDetailView" style="display:none">
             <div class="section-header">
-                <button class="btn btn-text" onclick="UserVPS.backToList()">← 返回列表</button>
+                <button class="btn btn-text" onclick="UserVPS.backToList()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    返回列表
+                </button>
                 <h2 id="vmDetailTitle">虚拟机详情</h2>
             </div>
-
             <div class="detail-cards" id="vmDetailContent"></div>
         </div>
     </main>
