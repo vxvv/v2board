@@ -29,7 +29,6 @@
                 header: '{{$theme_config['theme_header']}}',
                 color: '{{$theme_config['theme_color']}}',
             },
-            version: '{{$version}}',
             background_url: '{{$theme_config['background_url']}}',
             description: '{{$description}}',
             i18n: [

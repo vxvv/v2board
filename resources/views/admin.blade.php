@@ -18,7 +18,6 @@
                 header: '{{$theme_header}}',
                 color: '{{$theme_color}}',
             },
-            version: '{{$version}}',
             background_url: '{{$background_url}}',
             logo: '{{$logo}}',
             secure_path: '{{$secure_path}}'

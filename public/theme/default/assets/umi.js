@@ -24152,9 +24152,7 @@
                 }, this.state.nav.map(e=>{
                     return this.renderMenu(e.type, e.title, e.href, e.icon)
                 }
-                ))), i.a.createElement("div", {
-                    className: "v2board-copyright"
-                }, window.settings.title ? window.settings.title : "V2Board", " v1.7.4"))
+                ))))
             }
         }
         var f = Object(c["c"])(e=>{

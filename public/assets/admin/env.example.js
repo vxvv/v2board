@@ -1,6 +1,6 @@
 window.settings = {
   // 站点标题
-  title: 'V2Board',
+  title: '',
   // API
   host: '',
   // 主题
