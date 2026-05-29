@@ -171,6 +171,25 @@ class AdminRoute
             $router->get ('/theme/getThemes', 'V1\\Admin\\ThemeController@getThemes');
             $router->post('/theme/saveThemeConfig', 'V1\\Admin\\ThemeController@saveThemeConfig');
             $router->post('/theme/getThemeConfig', 'V1\\Admin\\ThemeController@getThemeConfig');
+            // VPS - Node Management
+            $router->get ('/vps/node/fetch', 'V1\\Admin\\Vps\\NodeController@fetch');
+            $router->post('/vps/node/save', 'V1\\Admin\\Vps\\NodeController@save');
+            $router->post('/vps/node/drop', 'V1\\Admin\\Vps\\NodeController@drop');
+            $router->post('/vps/node/testConnection', 'V1\\Admin\\Vps\\NodeController@testConnection');
+            $router->post('/vps/node/syncResources', 'V1\\Admin\\Vps\\NodeController@syncResources');
+            $router->post('/vps/node/initNatPorts', 'V1\\Admin\\Vps\\NodeController@initNatPorts');
+            // VPS - Template Management
+            $router->get ('/vps/template/fetch', 'V1\\Admin\\Vps\\TemplateController@fetch');
+            $router->post('/vps/template/save', 'V1\\Admin\\Vps\\TemplateController@save');
+            $router->post('/vps/template/drop', 'V1\\Admin\\Vps\\TemplateController@drop');
+            $router->post('/vps/template/listIsos', 'V1\\Admin\\Vps\\TemplateController@listIsos');
+            // VPS - VM Management
+            $router->get ('/vps/vm/fetch', 'V1\\Admin\\Vps\\VmController@fetch');
+            $router->post('/vps/vm/detail', 'V1\\Admin\\Vps\\VmController@detail');
+            $router->post('/vps/vm/create', 'V1\\Admin\\Vps\\VmController@create');
+            $router->post('/vps/vm/control', 'V1\\Admin\\Vps\\VmController@control');
+            $router->post('/vps/vm/destroy', 'V1\\Admin\\Vps\\VmController@destroy');
+            $router->post('/vps/vm/console', 'V1\\Admin\\Vps\\VmController@console');
         });
     }
 }

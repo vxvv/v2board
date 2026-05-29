@@ -585,4 +585,107 @@ CREATE TABLE `v2_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+-- VPS Platform Tables
+
+DROP TABLE IF EXISTS `v2_hypervisor_node`;
+CREATE TABLE `v2_hypervisor_node` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `host` varchar(255) NOT NULL COMMENT 'PVE host URL',
+    `token_id` varchar(255) NOT NULL COMMENT 'PVE API token ID',
+    `token_secret` text NOT NULL COMMENT 'PVE API token secret',
+    `storage` varchar(64) NOT NULL DEFAULT 'local-lvm',
+    `network_bridge` varchar(32) NOT NULL DEFAULT 'vmbr1',
+    `nat_interface` varchar(32) NOT NULL DEFAULT 'vmbr0',
+    `nat_gateway` varchar(45) DEFAULT NULL,
+    `nat_subnet` varchar(45) NOT NULL DEFAULT '10.0.0.0/24',
+    `dhcp_range_start` varchar(45) NOT NULL DEFAULT '10.0.0.100',
+    `dhcp_range_end` varchar(45) NOT NULL DEFAULT '10.0.0.250',
+    `total_cpu` int(11) NOT NULL DEFAULT '0',
+    `total_ram` int(11) NOT NULL DEFAULT '0',
+    `total_disk` int(11) NOT NULL DEFAULT '0',
+    `allocated_cpu` int(11) NOT NULL DEFAULT '0',
+    `allocated_ram` int(11) NOT NULL DEFAULT '0',
+    `allocated_disk` int(11) NOT NULL DEFAULT '0',
+    `status` tinyint(1) NOT NULL DEFAULT '1',
+    `sort` int(11) DEFAULT NULL,
+    `created_at` int(11) NOT NULL,
+    `updated_at` int(11) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `v2_vm_template`;
+CREATE TABLE `v2_vm_template` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `type` varchar(16) NOT NULL DEFAULT 'iso',
+    `os_type` varchar(32) NOT NULL DEFAULT 'l26',
+    `file` varchar(512) NOT NULL,
+    `storage` varchar(64) NOT NULL DEFAULT 'local',
+    `min_cpu` int(11) NOT NULL DEFAULT '1',
+    `min_ram` int(11) NOT NULL DEFAULT '512',
+    `min_disk` int(11) NOT NULL DEFAULT '10',
+    `show` tinyint(1) NOT NULL DEFAULT '1',
+    `sort` int(11) DEFAULT NULL,
+    `created_at` int(11) NOT NULL,
+    `updated_at` int(11) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `v2_virtual_machine`;
+CREATE TABLE `v2_virtual_machine` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `plan_id` int(11) NOT NULL,
+    `order_id` int(11) DEFAULT NULL,
+    `node_id` int(11) NOT NULL,
+    `template_id` int(11) DEFAULT NULL,
+    `vmid` int(11) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `hostname` varchar(255) DEFAULT NULL,
+    `cpu` int(11) NOT NULL,
+    `ram` int(11) NOT NULL,
+    `disk` int(11) NOT NULL,
+    `bandwidth` int(11) NOT NULL DEFAULT '0',
+    `internal_ip` varchar(45) DEFAULT NULL,
+    `status` varchar(32) NOT NULL DEFAULT 'creating',
+    `os_name` varchar(255) DEFAULT NULL,
+    `nat_port_start` int(11) DEFAULT NULL,
+    `nat_port_end` int(11) DEFAULT NULL,
+    `vnc_port` int(11) DEFAULT NULL,
+    `password` text DEFAULT NULL,
+    `traffic_up` bigint(20) NOT NULL DEFAULT '0',
+    `traffic_down` bigint(20) NOT NULL DEFAULT '0',
+    `traffic_limit` bigint(20) NOT NULL DEFAULT '0',
+    `expired_at` int(11) DEFAULT NULL,
+    `suspended_at` int(11) DEFAULT NULL,
+    `created_at` int(11) NOT NULL,
+    `updated_at` int(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_user` (`user_id`),
+    KEY `idx_node_vmid` (`node_id`, `vmid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `v2_nat_port_pool`;
+CREATE TABLE `v2_nat_port_pool` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `node_id` int(11) NOT NULL,
+    `port_start` int(11) NOT NULL,
+    `port_end` int(11) NOT NULL,
+    `vm_id` int(11) DEFAULT NULL,
+    `created_at` int(11) NOT NULL,
+    `updated_at` int(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_node_vm` (`node_id`, `vm_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Add VPS fields to v2_plan
+ALTER TABLE `v2_plan` ADD COLUMN `cpu_cores` int(11) NOT NULL DEFAULT '0' AFTER `speed_limit`;
+ALTER TABLE `v2_plan` ADD COLUMN `ram_mb` int(11) NOT NULL DEFAULT '0' AFTER `cpu_cores`;
+ALTER TABLE `v2_plan` ADD COLUMN `disk_gb` int(11) NOT NULL DEFAULT '0' AFTER `ram_mb`;
+ALTER TABLE `v2_plan` ADD COLUMN `bandwidth_mbps` int(11) NOT NULL DEFAULT '0' AFTER `disk_gb`;
+ALTER TABLE `v2_plan` ADD COLUMN `nat_ports` int(11) NOT NULL DEFAULT '20' AFTER `bandwidth_mbps`;
+ALTER TABLE `v2_plan` ADD COLUMN `traffic_limit` bigint(20) NOT NULL DEFAULT '0' AFTER `nat_ports`;
+ALTER TABLE `v2_plan` ADD COLUMN `plan_type` tinyint(1) NOT NULL DEFAULT '0' AFTER `traffic_limit`;
+
 -- 2025-09-12 10:05:00

@@ -62,6 +62,14 @@ class UserRoute
             $router->get ('/knowledge/getCategory', 'V1\\User\\KnowledgeController@getCategory');
             // Stat
             $router->get ('/stat/getTrafficLog', 'V1\\User\\StatController@getTrafficLog');
+            // VPS
+            $router->get ('/vm/fetch', 'V1\\User\\VmController@fetch');
+            $router->post('/vm/detail', 'V1\\User\\VmController@detail');
+            $router->post('/vm/control', 'V1\\User\\VmController@control');
+            $router->post('/vm/rebuild', 'V1\\User\\VmController@rebuild');
+            $router->post('/vm/console', 'V1\\User\\VmController@console');
+            $router->get ('/vm/templates', 'V1\\User\\VmController@templates');
+            $router->post('/vm/syncIp', 'V1\\User\\VmController@syncIp');
         });
     }
 }

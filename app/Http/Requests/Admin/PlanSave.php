@@ -16,8 +16,8 @@ class PlanSave extends FormRequest
         return [
             'name' => 'required',
             'content' => '',
-            'group_id' => 'required',
-            'transfer_enable' => 'required',
+            'group_id' => 'required_without:plan_type|nullable',
+            'transfer_enable' => 'required_without:plan_type|nullable',
             'device_limit' => 'nullable|integer',
             'month_price' => 'nullable|integer',
             'quarter_price' => 'nullable|integer',
@@ -29,7 +29,15 @@ class PlanSave extends FormRequest
             'reset_price' => 'nullable|integer',
             'reset_traffic_method' => 'nullable|integer|in:0,1,2,3,4',
             'capacity_limit' => 'nullable|integer',
-            'speed_limit' => 'nullable|integer'
+            'speed_limit' => 'nullable|integer',
+            // VPS fields
+            'plan_type' => 'nullable|integer|in:0,1',
+            'cpu_cores' => 'nullable|integer|min:0',
+            'ram_mb' => 'nullable|integer|min:0',
+            'disk_gb' => 'nullable|integer|min:0',
+            'bandwidth_mbps' => 'nullable|integer|min:0',
+            'nat_ports' => 'nullable|integer|min:0',
+            'traffic_limit' => 'nullable|integer|min:0',
         ];
     }
 
