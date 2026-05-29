@@ -6,7 +6,9 @@ use App\Jobs\OrderHandleJob;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\User;
+use App\Models\VirtualMachine;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -48,6 +50,12 @@ class OrderService
         }
 
         $plan = Plan::find($order->plan_id);
+
+        // VPS plan: provision or renew VM
+        if ($plan && (int)$plan->plan_type === 1) {
+            $this->openVps($order, $plan);
+            return;
+        }
 
         if ($order->refund_amount) {
             $this->user->balance = $this->user->balance + $order->refund_amount;
@@ -374,6 +382,57 @@ class OrderService
             case 1:
                 $this->buyByResetTraffic();
                 break;
+        }
+    }
+
+    private function openVps(Order $order, Plan $plan): void
+    {
+        DB::beginTransaction();
+        try {
+            if ((int)$order->type === 1) {
+                // New purchase: provision VM
+                $templateId = $order->vm_template_id ?? null;
+                if (!$templateId) {
+                    // Use first available template
+                    $template = \App\Models\VmTemplate::where('show', 1)->first();
+                    $templateId = $template ? $template->id : null;
+                }
+                if (!$templateId) {
+                    throw new \RuntimeException('没有可用的系统模板');
+                }
+
+                $vmService = new VmService();
+                $vm = $vmService->create($this->user, $plan, $templateId, $order->id);
+
+                // Set expiration based on period
+                $months = self::STR_TO_TIME[$order->period] ?? 1;
+                $vm->update(['expired_at' => strtotime("+{$months} months")]);
+
+            } elseif ((int)$order->type === 2) {
+                // Renewal: extend existing VM
+                $vm = VirtualMachine::where('user_id', $this->user->id)
+                    ->where('plan_id', $plan->id)
+                    ->orderBy('id', 'DESC')
+                    ->first();
+
+                if ($vm) {
+                    $months = self::STR_TO_TIME[$order->period] ?? 1;
+                    $baseTime = ($vm->expired_at && $vm->expired_at > time()) ? $vm->expired_at : time();
+                    $vm->update([
+                        'expired_at' => strtotime("+{$months} months", $baseTime),
+                        'status' => $vm->status === 'suspended' ? 'stopped' : $vm->status,
+                        'suspended_at' => null,
+                    ]);
+                }
+            }
+
+            $order->status = 3;
+            $order->save();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('VPS order open failed: ' . $e->getMessage());
+            abort(500, '开通VPS失败: ' . $e->getMessage());
         }
     }
 
