@@ -73,10 +73,9 @@ class UniProxyController extends Controller
     {
         $data = $request->json()->all();
         if (empty($data)) {
-            $data = $_POST;
+            $data = $request->all();
         }
         if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-            // JSON decoding error
             return response([
                 'error' => 'Invalid traffic data'
             ], 400);
@@ -127,7 +126,7 @@ class UniProxyController extends Controller
     {
         $data = $request->json()->all();
         if (empty($data)) {
-            $data = $_POST;
+            $data = $request->all();
         }
         if (empty($data)) {
             return response([

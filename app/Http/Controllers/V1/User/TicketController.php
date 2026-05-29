@@ -227,30 +227,31 @@ class TicketController extends Controller
 			$user = User::find($userid);
 
 			if ($user) {
-				$transfer_enable = $this->getFlowData($user->transfer_enable); // 总流量
-				$remaining_traffic = $this->getFlowData($user->transfer_enable - $user->u - $user->d); // 剩余流量
-				$u = $this->getFlowData($user->u); // 上传
-				$d = $this->getFlowData($user->d); // 下载
-				$expired_at = date("Y-m-d H:i:s", $user->expired_at); // 到期时间
-				if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-				$ip_address = $_SERVER['HTTP_X_REAL_IP'];
-				} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-					$ip_address = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-				} else {
-					$ip_address = $_SERVER['REMOTE_ADDR'];
-				}
+				$transfer_enable = $this->getFlowData($user->transfer_enable);
+				$remaining_traffic = $this->getFlowData($user->transfer_enable - $user->u - $user->d);
+				$u = $this->getFlowData($user->u);
+				$d = $this->getFlowData($user->d);
+				$expired_at = date("Y-m-d H:i:s", $user->expired_at);
+				$ip_address = request()->ip();
 
-				$api_url = "http://ip-api.com/json/{$ip_address}?fields=520191&lang=zh-CN";
-				$response = file_get_contents($api_url);
-				$user_location = json_decode($response, true);
-				if ($user_location && $user_location['status'] === 'success') {
-					$location =  $user_location['city'] . ", " . $user_location['country'];
-				} else {
-					$location =  "无法确定用户地址";
+				$location = "无法确定用户地址";
+				if (filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+					try {
+						$cleanIp = urlencode($ip_address);
+						$api_url = "http://ip-api.com/json/{$cleanIp}?fields=520191&lang=zh-CN";
+						$ctx = stream_context_create(['http' => ['timeout' => 3]]);
+						$response = file_get_contents($api_url, false, $ctx);
+						$user_location = json_decode($response, true);
+						if ($user_location && $user_location['status'] === 'success') {
+							$location = $user_location['city'] . ", " . $user_location['country'];
+						}
+					} catch (\Exception $e) {
+						// silently fall back to default location
+					}
 				}
 
 				$plan = Plan::where('id', $user->plan_id)->first();
-				$planName = $plan ? $plan->name : '未找到套餐信息'; // Check if plan data is available
+				$planName = $plan ? $plan->name : '未找到套餐信息';
 
 				$money = $user->balance / 100;
 				$affmoney = $user->commission_balance / 100;
