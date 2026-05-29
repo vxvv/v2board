@@ -68,7 +68,7 @@ class ShadowsocksTidalabController extends Controller
                 'msg' => 'server is not found'
             ]);
         }
-        $data = request()->getContent() ?: json_encode($_POST);
+        $data = request()->getContent() ?: json_encode(request()->all());
         $data = json_decode($data, true);
         Cache::put(CacheKey::get('SERVER_SHADOWSOCKS_ONLINE_USER', $server->id), count($data), 3600);
         Cache::put(CacheKey::get('SERVER_SHADOWSOCKS_LAST_PUSH_AT', $server->id), time(), 3600);
