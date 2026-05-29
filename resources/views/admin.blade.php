@@ -30,6 +30,9 @@
 <script src="/assets/admin/vendors.async.js?v={{$version}}"></script>
 <script src="/assets/admin/components.async.js?v={{$version}}"></script>
 <script src="/assets/admin/umi.js?v={{$version}}"></script>
+@if (file_exists(public_path('assets/admin/custom.js')))
+    <script src="/assets/admin/custom.js?v={{$version}}"></script>
+@endif
 </body>
 
 </html>

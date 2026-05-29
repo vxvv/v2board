@@ -51,6 +51,25 @@ Route::get('/' . config('v2board.secure_path', config('v2board.frontend_admin_pa
     ]);
 });
 
+// Admin VPS Management
+Route::get('/' . config('v2board.secure_path', config('v2board.frontend_admin_path', hash('crc32b', config('app.key')))) . '/vps', function () {
+    return view('admin-vps', [
+        'title' => config('v2board.app_name', 'V2Board'),
+        'version' => config('app.version'),
+        'logo' => config('v2board.logo'),
+        'secure_path' => config('v2board.secure_path', config('v2board.frontend_admin_path', hash('crc32b', config('app.key'))))
+    ]);
+});
+
+// User VPS Dashboard
+Route::get('/vps', function () {
+    return view('user-vps', [
+        'title' => config('v2board.app_name', 'V2Board'),
+        'version' => config('app.version'),
+        'logo' => config('v2board.logo'),
+    ]);
+});
+
 if (!empty(config('v2board.subscribe_path'))) {
     Route::get(config('v2board.subscribe_path'), 'V1\\Client\\ClientController@subscribe')->middleware('client');
 }
